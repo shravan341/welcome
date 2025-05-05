@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git 'https://github.com/your-username/your-repo.git' // Update repo URL
+                git 'https://github.com/shravan341/welcome.git' // Update repo URL
             }
         }
         
@@ -26,7 +26,7 @@ pipeline {
                     
                     // Run new container
                     docker.image("basic:${env.BUILD_ID}").run(
-                        "--name basic-container -d -p 8081:80"
+                        "--name basic-container -d -p 8081:90"
                     )
                 }
             }
