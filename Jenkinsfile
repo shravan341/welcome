@@ -2,16 +2,17 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
-                git 'https://github.com/your-username/your-html-repo.git' // Replace with your repo
+                git 'https://github.com/your-username/your-repo.git' // Update repo URL
             }
         }
         
-        stage('Build Docker Image') {
+        stage('Build Image') {
             steps {
                 script {
-                    dockerImage = docker.build("html-app:${env.BUILD_ID}")
+                    // Build using your existing image name
+                    docker.build("basic:${env.BUILD_ID}")
                 }
             }
         }
@@ -19,7 +20,14 @@ pipeline {
         stage('Run Container') {
             steps {
                 script {
-                    dockerImage.run("-d --name html-container -p 8081:80")
+                    // Stop and remove old container first
+                    sh 'docker stop basic-container || true'
+                    sh 'docker rm basic-container || true'
+                    
+                    // Run new container
+                    docker.image("basic:${env.BUILD_ID}").run(
+                        "--name basic-container -d -p 8081:80"
+                    )
                 }
             }
         }
@@ -28,10 +36,8 @@ pipeline {
     post {
         always {
             script {
-                // Cleanup containers and images
-                sh 'docker stop html-container || true'
-                sh 'docker rm html-container || true'
-                sh 'docker rmi html-app:${BUILD_ID} || true'
+                // Optional: Clean old images
+                sh 'docker rmi basic:${BUILD_ID} || true'
             }
         }
     }
